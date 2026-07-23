@@ -25,6 +25,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* TODO: Add the rest of the functions (enum + interrupt wrapper)
+ * Section labeled "INT 60H 仕様" in PMD.ASM documents all the functions, their arguments, and their outputs.
+ */
 enum pmdFuncId {
 	PMD_FUNC_MUSIC_START = 0x00,
 	PMD_FUNC_MUSIC_STOP = 0x01,

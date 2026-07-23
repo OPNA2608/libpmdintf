@@ -194,6 +194,7 @@ bool pmdLoadFile (char* filePath) {
 	} while (*(fileName - 1) != '\0');
 
 	/* area for music data allocated by driver and borders non-music data, must not over-write */
+	/* TODO: Code for this in PMP likely predated the GET_SIZE function in PMD. Switch to using that instead. */
 	pmd_get_effectdata_address ((void far**) &effectdataAddr);
 	pmd_get_musicdata_address ((void far**) &musicdataAddr);
 	fileLengthMax = effectdataAddr - musicdataAddr;
