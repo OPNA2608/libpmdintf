@@ -148,6 +148,12 @@ bool pmd_get_memo_address (uint8_t memoId, char far** addressOut) {
 	return true;
 }
 
+/*
+ * FIXME: This bloats file size ALOT just be existing, Watcom is seemingly not good at eliminating unused code...
+ * - File I/O stuff from the clib is likely the reason. Switch to DOS' file I/O functions?
+ * - Pull it into a separate library, pmdio.lib?
+ * - Just document how to load files, and leave this fully up to the user?
+ */
 bool pmdLoadFile (char* filePath) {
 	int i;
 	size_t fileCopyCount;
