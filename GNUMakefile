@@ -1,0 +1,58 @@
+BUILDDIR = build
+OBJDIR := $(BUILDDIR)/obj
+
+CC = wcc
+CFLAGS_COMMON = -0 -ms -wx -we
+CFLAGS_LIB = $(CFLAGS_COMMON)
+CFLAGS_EXE = $(CFLAGS_COMMON) -i=src/
+
+LD_LIB = wlib
+LD_EXE = wlink
+LDFLAGS_LIB = -b -c -n
+LDFLAGS_EXE = SYSTEM com
+
+# Watcom tools are not safe to use in parallel, create temporary files that will overwrite each other
+.NOTPARALLEL:
+
+.PHONY: all
+all: lib examples
+
+.PHONY: lib
+lib: $(BUILDDIR)/pmdint.lib
+
+.PHONY: examples
+examples: pmd-test
+
+.PHONY: pmd-test
+pmd-test: $(BUILDDIR)/pmd-test.com
+
+$(BUILDDIR)/pmd-test.com: $(BUILDDIR)/pmdint.lib $(OBJDIR)/pmd-test.obj
+	$(LD_EXE) $(LDFLAGS_EXE) \
+		LIBFILE $(BUILDDIR)/pmdint.lib \
+		FILE $(OBJDIR)/pmd-test.obj \
+		NAME $(BUILDDIR)/pmd-test.com
+
+$(OBJDIR)/pmd-test.obj: examples/pmd-test.c | $(OBJDIR)
+	$(CC) $(CFLAGS_EXE) \
+		-fo=$@ \
+		$<
+
+$(BUILDDIR)/pmdint.lib: $(OBJDIR)/pmd.obj
+	$(LD_LIB) $(LDFLAGS_LIB) \
+		$@ \
+		$(addprefix -+,$^)
+
+$(OBJDIR)/pmd.obj: src/pmd.c src/pmd.h | $(OBJDIR)
+	$(CC) $(CFLAGS_LIB) \
+		-fo=$@ \
+		$<
+
+$(OBJDIR): | $(BUILDDIR)
+	mkdir $(OBJDIR)
+
+$(BUILDDIR):
+	mkdir $(BUILDDIR)
+
+.PHONY: clean
+clean:
+	-rm -rf $(BUILDDIR)
