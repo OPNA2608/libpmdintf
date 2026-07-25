@@ -21,18 +21,32 @@ all: lib examples
 lib: $(BUILDDIR)/pmdint.lib
 
 .PHONY: examples
-examples: pmd-test
+examples: pmd-test st1-chck
 
 .PHONY: pmd-test
 pmd-test: $(BUILDDIR)/pmd-test.com
 
-$(BUILDDIR)/pmd-test.com: $(BUILDDIR)/pmdint.lib $(OBJDIR)/pmd-test.obj
+.PHONY: st1-chck
+st1-chck: $(BUILDDIR)/st1-chck.com
+
+$(BUILDDIR)/pmd-test.com: $(OBJDIR)/pmd-test.obj $(BUILDDIR)/pmdint.lib
 	$(LD_EXE) $(LDFLAGS_EXE) \
 		LIBFILE $(BUILDDIR)/pmdint.lib \
-		FILE $(OBJDIR)/pmd-test.obj \
-		NAME $(BUILDDIR)/pmd-test.com
+		FILE $< \
+		NAME $@
+
+$(BUILDDIR)/st1-chck.com: $(OBJDIR)/st1-chck.obj $(BUILDDIR)/pmdint.lib
+	$(LD_EXE) $(LDFLAGS_EXE) \
+		LIBFILE $(BUILDDIR)/pmdint.lib \
+		FILE $< \
+		NAME $@
 
 $(OBJDIR)/pmd-test.obj: examples/pmd-test.c | $(OBJDIR)
+	$(CC) $(CFLAGS_EXE) \
+		-fo=$@ \
+		$<
+
+$(OBJDIR)/st1-chck.obj: examples/status1-checker.c | $(OBJDIR)
 	$(CC) $(CFLAGS_EXE) \
 		-fo=$@ \
 		$<
