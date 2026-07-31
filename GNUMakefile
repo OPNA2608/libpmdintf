@@ -21,15 +21,24 @@ all: lib examples
 lib: $(BUILDDIR)/pmdint.lib
 
 .PHONY: examples
-examples: pmd-test st1-chck
+examples: pmd-test partmask st1-chck
 
 .PHONY: pmd-test
 pmd-test: $(BUILDDIR)/pmd-test.com
+
+.PHONY: partmask
+partmask: $(BUILDDIR)/partmask.com
 
 .PHONY: st1-chck
 st1-chck: $(BUILDDIR)/st1-chck.com
 
 $(BUILDDIR)/pmd-test.com: $(OBJDIR)/pmd-test.obj $(BUILDDIR)/pmdint.lib
+	$(LD_EXE) $(LDFLAGS_EXE) \
+		LIBFILE $(BUILDDIR)/pmdint.lib \
+		FILE $< \
+		NAME $@
+
+$(BUILDDIR)/partmask.com: $(OBJDIR)/partmask.obj $(BUILDDIR)/pmdint.lib
 	$(LD_EXE) $(LDFLAGS_EXE) \
 		LIBFILE $(BUILDDIR)/pmdint.lib \
 		FILE $< \
@@ -42,6 +51,11 @@ $(BUILDDIR)/st1-chck.com: $(OBJDIR)/st1-chck.obj $(BUILDDIR)/pmdint.lib
 		NAME $@
 
 $(OBJDIR)/pmd-test.obj: examples/pmd-test.c | $(OBJDIR)
+	$(CC) $(CFLAGS_EXE) \
+		-fo=$@ \
+		$<
+
+$(OBJDIR)/partmask.obj: examples/parts-masked.c | $(OBJDIR)
 	$(CC) $(CFLAGS_EXE) \
 		-fo=$@ \
 		$<
