@@ -43,8 +43,58 @@ enum pmdFuncId {
 	PMD_FUNC_GET_PCM_ADDR = 0x0E,
 	PMD_FUNC_GET_WORK_ADDR = 0x0E,
 	PMD_FUNC_GET_MEMO_ADDR = 0x1D,
+	PMD_FUNC_PART_MASK = 0x1E,
 	PMD_FUNC_GET_FILENAME_ADDR = 0x21,
-	PMD_FUNC_GET_SIZE = 0x22
+	PMD_FUNC_GET_SIZE = 0x22,
+
+	PMD_FUNC_END
+};
+
+/* part_table in PMD.ASM */
+enum pmdPartId {
+	/* FM1-3 */
+	PMD_PART_A = 0x00,
+	PMD_PART_B = 0x01,
+	PMD_PART_C = 0x02,
+
+	/* might be FM4-6 on OPNA, might be extended parts of FM3 */
+	PMD_PART_D = 0x03,
+	PMD_PART_E = 0x04,
+	PMD_PART_F = 0x05,
+
+	/* SSG1-3 */
+	PMD_PART_G = 0x06,
+	PMD_PART_H = 0x07,
+	PMD_PART_I = 0x08,
+
+	/* PCM */
+	PMD_PART_J = 0x09,
+
+	/* Rhythm pattern selection */
+	PMD_PART_K = 0x0A,
+
+	/* extended parts of FM3 */
+	PMD_PART_C2 = 0x0B,
+	PMD_PART_C3 = 0x0C,
+	PMD_PART_C4 = 0x0D,
+
+	/* TODO: "Rhythm" ? */
+	PMD_PART_RHYTHM = 0x0E,
+
+	/* "Effect" */
+	PMD_PART_EFFECT = 0x0F,
+
+	/* PPZ1-8 */
+	PMD_PART_PPZ1 = 0x10,
+	PMD_PART_PPZ2 = 0x11,
+	PMD_PART_PPZ3 = 0x12,
+	PMD_PART_PPZ4 = 0x13,
+	PMD_PART_PPZ5 = 0x14,
+	PMD_PART_PPZ6 = 0x15,
+	PMD_PART_PPZ7 = 0x16,
+	PMD_PART_PPZ8 = 0x17,
+
+	PMD_PART_END
 };
 
 bool pmdIsResident (void);
@@ -179,6 +229,20 @@ bool pmdCallFunc (
 		false, NULL, \
 		true, addressOut \
 	)
+/* clang-format on */
+
+bool pmd_get_memo_address (uint8_t memoId, char far** addressOut);
+
+/* side-by-side for readability */
+/* clang-format off */
+#	define pmd_set_part_mask(partToAffect) \
+	pmdCallFunc ( \
+		PMD_FUNC_PART_MASK, \
+		true, partToAffect, \
+		false, NULL, \
+		false, NULL, \
+		false, NULL \
+	)
 
 #	define pmd_get_filename_address(addressOut) \
 	pmdCallFunc ( \
@@ -189,7 +253,5 @@ bool pmdCallFunc (
 		true, addressOut \
 	)
 /* clang-format on */
-
-bool pmd_get_memo_address (uint8_t memoId, char far** addressOut);
 
 #endif /* LIBPMDINTF_PMD_H */
