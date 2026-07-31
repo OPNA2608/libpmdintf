@@ -11,7 +11,7 @@ void printUsage (char* name) {
 	printf (
 		"Usage: %s <SONG.M> [ch1 [ch2 [... [chN]]]]\n"
 		"\n"
-		"Plays <SONG.M> (for 2 loops), with all channels muted.\n"
+		"Plays <SONG.M> (main loop thrice, or until end), with all channels muted.\n"
 		"If any channel names are specified after <SONG.M>, then those will be unmuted.\n",
 		name
 	);
@@ -47,8 +47,8 @@ int main (int argc, char** argv) {
 	int argNumber;
 	bool partKnown;
 	uint8_t partValueForCall;
-	uint8_t status1, prevStatus1;
-	uint8_t status2, prevStatus2;
+	uint8_t status1;
+	uint8_t status2;
 
 	if (argc <= 1) {
 		printUsage ((argc == 1) ? argv[0] : TOOL_NAME);
@@ -63,7 +63,7 @@ int main (int argc, char** argv) {
 	pmd_music_stop();
 	pmdLoadFile (argv[1]);
 
-	printf ("[default] muting part: ");
+	printf ("[default] Muting part: ");
 	for (partToAffect = PMD_PART_A; partToAffect < PMD_PART_END; ++partToAffect) {
 		printf ("%s%s", (partToAffect != PMD_PART_A) ? ", " : "", partLabels[partToAffect]);
 		partValueForCall = partToAffect;
@@ -96,19 +96,16 @@ int main (int argc, char** argv) {
 	fprintf (stderr, "(press any key to quit early)\n");
 
 	while (true) {
-		prevStatus1 = status1;
-		prevStatus2 = status2;
-
 		if (kbhit()) {
-			fprintf (stderr, "key pressed, exiting.\n");
+			fprintf (stderr, "Key pressed, exiting.\n");
 			break;
 		}
 		if (!pmd_get_status (&status1, &status2)) {
 			fprintf (stderr, "Error while getting PMD status, exiting.\n");
 			break;
 		}
-		if (status2 > prevStatus2) {
-			fprintf (stderr, "Song looped or finished, exiting.\n");
+		if (status2 > 0x02) {
+			fprintf (stderr, "Song looped thrice or finished, exiting.\n");
 			break;
 		}
 	}
